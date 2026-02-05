@@ -1,0 +1,629 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>2 Years — Anniversary</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;600;800&family=Parisienne&display=swap" rel="stylesheet">
+
+  <!-- GSAP + ScrollTrigger (CDN) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+  <style>
+  /* Single-file styles
+     Modern, bright, ultra-romantic single-page styles.
+     Easy theming via CSS variables. Responsive and accessible.
+  */
+
+  :root{
+    --bg:#fff8fb;
+    --hero-gradient-1: #ffe6f0;
+    --hero-gradient-2: #fff0e8;
+    --accent1: #ff6b8a;
+    --accent2: #ff9fb1;
+    --accent3: #ffc9d3;
+    --muted:#6b6b6b;
+    --glass: rgba(255,255,255,0.55);
+    --card-bg: rgba(255,255,255,0.7);
+    --max-width: 1100px;
+    --radius: 18px;
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family: "Montserrat", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg, var(--bg) 0%, #fff 100%);
+    color:#222;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden;
+    scroll-behavior:smooth;
+  }
+
+  /* Canvas sits behind visuals */
+  #heart-canvas{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+  }
+
+  /* Page layout */
+  .section-hero{
+    position:relative;
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    z-index:1;
+    overflow:hidden;
+    padding:4rem 1.25rem;
+  }
+
+  .hero-bg{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background: radial-gradient(1200px 400px at 10% 20%, rgba(255,173,199,0.18), transparent 8%),
+                radial-gradient(800px 300px at 90% 80%, rgba(255,230,190,0.14), transparent 12%),
+                linear-gradient(180deg, var(--hero-gradient-1), var(--hero-gradient-2));
+    filter: saturate(1.05) blur(6px);
+  }
+
+  .blobs{ position:absolute; inset:0; mix-blend-mode:screen; opacity:0.95; }
+  .blob{ position:absolute; border-radius:50%; filter: blur(18px); transform-origin:center; opacity:0.9; }
+  .b1{ width:520px;height:520px; background:linear-gradient(135deg,#ffd1e3,#ffb3d2); left:-10%; top:5%; transform:rotate(10deg); }
+  .b2{ width:420px;height:420px; background:linear-gradient(135deg,#ffdfa9,#ffd1dd); right:-8%; bottom:0%; transform:rotate(-6deg); }
+  .b3{ width:260px;height:260px; background:linear-gradient(135deg,#ffdbe6,#ffe3b8); left:40%; top:18%; opacity:0.7; }
+
+  .hero-content{
+    position:relative;
+    z-index:2;
+    max-width:var(--max-width);
+    margin:auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:1.2rem;
+  }
+
+  .hero-title{
+    font-family:"Parisienne", "Montserrat", serif;
+    font-size:clamp(48px, 10vw, 110px);
+    line-height:0.9;
+    color: #ff245f;
+    text-shadow:
+      0 8px 40px rgba(255,99,135,0.16),
+      0 2px 8px rgba(0,0,0,0.04);
+    transform:translateY(0);
+    margin:0;
+    letter-spacing: -0.02em;
+  }
+
+  .hero-sub{
+    margin:0;
+    color:var(--muted);
+    font-size:clamp(16px, 2.8vw, 20px);
+  }
+
+  .btn-primary{
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    color:white;
+    border:none;
+    padding:0.85rem 1.25rem;
+    border-radius:999px;
+    font-weight:600;
+    cursor:pointer;
+    box-shadow: 0 8px 30px rgba(255,105,130,0.18);
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .btn-primary:active{ transform:translateY(2px) }
+  .btn-primary:focus{ outline:3px solid rgba(255,107,138,0.15); }
+
+  .btn-arrow{
+    background:transparent;
+    border:none;
+    color:rgba(30,30,30,0.9);
+    margin-left:0.75rem;
+    padding:0.4rem;
+    cursor:pointer;
+    transform-origin:center;
+    transition:transform .25s ease;
+  }
+
+  .hero-cta{
+    display:flex;
+    align-items:center;
+    gap:0.4rem;
+    margin-top:0.6rem;
+  }
+
+  .hero-divider{
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+    bottom:-2px;
+    width:60%;
+    height:70px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.0), rgba(255,255,255,0.7));
+    border-radius:50%;
+    z-index:1;
+    pointer-events:none;
+  }
+
+  .section{ padding:5rem 1.25rem; position:relative; z-index:1; }
+  .container{ max-width:var(--max-width); margin:0 auto; }
+
+  .section-title{
+    font-size:clamp(22px,4.5vw,36px);
+    margin:0;
+    color:#2b2130;
+    text-align:center;
+  }
+  .section-sub{ text-align:center; color:var(--muted); margin:0.6rem 0 2rem 0; }
+
+  .timeline{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(260px, 1fr));
+    gap:1.25rem;
+    margin-top:2rem;
+  }
+  .card{
+    background:var(--card-bg);
+    padding:1.25rem;
+    border-radius:14px;
+    box-shadow: 0 10px 30px rgba(36,20,30,0.06);
+    backdrop-filter: blur(6px);
+    transform-origin:center;
+  }
+  .card-date{ font-size:13px; color:var(--accent2); font-weight:600; margin-bottom:0.6rem; }
+  .card-title{ margin:0 0 0.5rem 0; font-size:18px; }
+  .card-text{ margin:0; color:#4b4b4b; line-height:1.45; }
+
+  .section-final{ background:linear-gradient(180deg,#fff 0%, #fff8fb 100%); padding:6rem 1.25rem; }
+  .final-quote{
+    font-size:clamp(22px,5vw,48px);
+    text-align:center;
+    margin:0 auto;
+    max-width:900px;
+    font-weight:600;
+    color:#382633;
+    position:relative;
+    padding-bottom:1rem;
+  }
+  .final-quote::after{
+    content:"";
+    display:block;
+    width:120px;
+    height:6px;
+    margin:16px auto 0;
+    border-radius:10px;
+    background:linear-gradient(90deg,var(--accent1),var(--accent2));
+    filter:blur(6px);
+    transition: width .45s;
+  }
+
+  .site-footer{ padding:2rem 1.25rem; color:var(--muted); background:transparent; text-align:center; }
+
+  /* Notifications */
+  #notifications{
+    position:fixed;
+    top:18px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    flex-direction:column;
+    gap:0.6rem;
+    z-index:999;
+    pointer-events:none;
+    width: min(640px, calc(100% - 32px));
+    align-items:center;
+  }
+  .notify{
+    pointer-events:auto;
+    display:flex;
+    gap:0.6rem;
+    align-items:flex-start;
+    background:linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.85));
+    padding:0.6rem 0.9rem;
+    border-radius:14px;
+    box-shadow: 0 10px 28px rgba(20,20,20,0.06);
+    backdrop-filter: blur(6px);
+    width:fit-content;
+    max-width:90%;
+    align-self:center;
+  }
+  .notify .meta{ font-weight:700; color:var(--accent1); font-size:13px; margin-bottom:4px;}
+  .notify .text{ font-size:14px; color:#3a3a3a; line-height:1.4; }
+
+  @media (max-width:720px){
+    .hero-content{ padding:0 8px; }
+    .hero-divider{ width:90%; height:40px; }
+    .timeline{ grid-template-columns:1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+    #heart-canvas{ display:none; }
+  }
+  </style>
+</head>
+<body>
+
+  <!-- Canvas for heart rain and animated background (pointer-events: none) -->
+  <canvas id="heart-canvas" aria-hidden="true"></canvas>
+
+  <!-- Floating notifications -->
+  <div id="notifications" aria-hidden="true"></div>
+
+  <main id="page">
+
+    <!-- HERO -->
+    <header id="hero" class="section-hero" role="banner">
+      <div class="hero-bg">
+        <div class="blobs" aria-hidden="true">
+          <div class="blob b1"></div>
+          <div class="blob b2"></div>
+          <div class="blob b3"></div>
+        </div>
+      </div>
+
+      <div class="hero-content" id="hero-content">
+        <h1 class="hero-title">2 Years</h1>
+        <p class="hero-sub">Это только начало</p>
+
+        <div class="hero-cta">
+          <button id="explore-btn" class="btn-primary" aria-label="Интересненько">Интересненько</button>
+          <button id="down-arrow" class="btn-arrow" aria-label="Scroll down">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="hero-divider" id="hero-divider" aria-hidden="true"></div>
+    </header>
+
+    <!-- STORIES (main content) -->
+    <section id="stories" class="section">
+      <div class="container">
+        <h2 class="section-title">Наши моменты</h2>
+        <p class="section-sub">Небольшие истории, которые греют душу</p>
+
+        <div class="timeline" id="timeline">
+          <article class="card reveal">
+            <div class="card-date">2024-07-10</div>
+            <h3 class="card-title">Первое свидание</h3>
+            <p class="card-text">Мы смеялись до слёз, и это ощущение — начало.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-date">2024-09-02</div>
+            <h3 class="card-title">Поездка на море</h3>
+            <p class="card-text">Закаты, морской воздух и твоя рука в моей.</p>
+          </article>
+
+          <article class="card reveal">
+            <div class="card-date">2025-01-20</div>
+            <h3 class="card-title">Тёплый вечер дома</h3>
+            <p class="card-text">Горячий шоколад и разговоры до утра.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINAL QUOTE -->
+    <section id="final" class="section section-final">
+      <div class="container">
+        <blockquote class="final-quote">«Каждый наш день — это маленькая вечность. Спасибо, что ты есть.»</blockquote>
+      </div>
+    </section>
+
+    <footer class="site-footer" role="contentinfo">
+      <div class="container small">
+        <p>Made with love • Customize texts in the top of the script block below</p>
+      </div>
+    </footer>
+
+  </main>
+
+  <script type="module">
+  // Single-file script (ES6)
+  // - Canvas heart rain (2D, performant)
+  // - Floating non-intrusive notifications
+  // - Hero magical transition + smooth scroll
+  // - ScrollTrigger reveal for story cards
+  //
+  // Customize the messages in CONFIG.messages
+
+  // CONFIG - editable
+  const CONFIG = {
+    messages: [
+      "я тебя люблю ❤️",
+      "ты моё солнце ☀️",
+      "поздравляю с нашей годовщиной",
+      "2 года вместе — и это только начало",
+      "я всегда рядом"
+    ],
+    notificationSender: "Max",
+    notificationInterval: [10000, 20000], // ms: random between 10-20s
+    heroSelector: "#hero",
+    heroContentSelector: "#hero-content",
+    heroDividerSelector: "#hero-divider"
+  };
+
+  const rand = (min, max) => Math.random() * (max - min) + min;
+  const randInt = (min, max) => Math.floor(rand(min, max + 1));
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Register GSAP plugins
+  gsap.registerPlugin(ScrollTrigger);
+
+  /*
+    HeartRain - lightweight canvas 2D hearts
+    - depth: size/opacity/blur variance
+    - gentle drift and sway
+    - respects prefers-reduced-motion
+  */
+  class HeartRain {
+    constructor(canvas) {
+      this.canvas = canvas;
+      this.ctx = canvas.getContext("2d");
+      this.particles = [];
+      this.spawnRate = 0.5; // baseline spawn per frame
+      this.lastFrame = 0;
+      this.running = true;
+      this.intensityFactor = 0.35;
+
+      this.resize();
+      window.addEventListener("resize", () => this.resize());
+
+      if (reducedMotion) {
+        this.running = false;
+        this.clear();
+        return;
+      }
+
+      this.initScrollObserver();
+      requestAnimationFrame(ts => this.loop(ts));
+    }
+
+    initScrollObserver(){
+      // increase intensity after hero is scrolled past
+      const hero = document.querySelector(CONFIG.heroSelector);
+      if (!hero) return;
+      const observer = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (!e.isIntersecting){
+            gsap.to(this, { intensityFactor: 1.0, duration: 1.0, ease: "power2.out" });
+          } else {
+            gsap.to(this, { intensityFactor: 0.35, duration: 1.0, ease: "power2.out" });
+          }
+        });
+      }, { threshold: 0.48 });
+      observer.observe(hero);
+    }
+
+    resize(){
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      this.dpr = dpr;
+      // canvas bitmap size
+      this.canvas.width = Math.floor(innerWidth * dpr);
+      this.canvas.height = Math.floor(innerHeight * dpr);
+      // set transform so we can draw in CSS px coordinates
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.width = innerWidth;
+      this.height = innerHeight;
+    }
+
+    clear(){
+      this.ctx.clearRect(0, 0, this.width, this.height);
+    }
+
+    spawn(){
+      const size = rand(8, 34) * (0.6 + this.intensityFactor);
+      const x = rand(0, this.width);
+      const y = -size - rand(0, 80);
+      const speed = rand(18, 80) * (0.6 + this.intensityFactor);
+      const drift = rand(-30, 30);
+      const hue = randInt(330, 350);
+      const saturation = randInt(70, 95);
+      const lightness = randInt(55, 75);
+      const blur = rand(0, 2.5);
+      const opacity = rand(0.45, 0.95);
+
+      this.particles.push({
+        x, y, size, speed, drift, hue, saturation, lightness, blur, opacity,
+        life: 0, sway: Math.random() * Math.PI * 2, rotate: rand(-0.2, 0.2)
+      });
+    }
+
+    drawHeart(ctx, x, y, size, color, alpha, rotation, blur){
+      ctx.save();
+      ctx.translate(x, y);
+      ctx.rotate(rotation);
+      if (blur > 0) ctx.filter = `blur(${blur}px)`;
+      ctx.globalAlpha = alpha;
+
+      // Simple, performant heart path scaled by size
+      ctx.beginPath();
+      const s = size / 16;
+      ctx.moveTo(0, -4 * s);
+      ctx.bezierCurveTo(4 * s, -14 * s, 20 * s, -6 * s, 0, 10 * s);
+      ctx.bezierCurveTo(-20 * s, -6 * s, -4 * s, -14 * s, 0, -4 * s);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      ctx.restore();
+      ctx.filter = "none";
+    }
+
+    loop(ts){
+      if (!this.running) return;
+      if (!this.lastFrame) this.lastFrame = ts;
+      const dt = (ts - this.lastFrame) / 1000;
+      this.lastFrame = ts;
+
+      // controlled spawn: fractional approach
+      const spawnChance = this.spawnRate * this.intensityFactor * 16 * dt;
+      let total = spawnChance;
+      while (total > 0) {
+        if (Math.random() < Math.min(1, total)) this.spawn();
+        total--;
+      }
+
+      // clear
+      this.ctx.clearRect(0, 0, this.width, this.height);
+
+      // update + draw
+      for (let i = this.particles.length - 1; i >= 0; i--) {
+        const p = this.particles[i];
+        p.life += dt;
+        p.sway += dt * rand(0.6, 1.2);
+        p.x += Math.sin(p.sway) * (p.drift * 0.02) * dt * 60;
+        p.y += p.speed * dt;
+        p.rotate += Math.sin(p.life * 0.5) * 0.02;
+
+        const depthFactor = (p.size / 34);
+        const alpha = clamp(p.opacity * (0.6 + depthFactor), 0.05, 1);
+        const color = `hsl(${p.hue} ${p.saturation}% ${p.lightness}%)`;
+        this.drawHeart(this.ctx, p.x, p.y, p.size, color, alpha, p.rotate, p.blur);
+
+        if (p.y - p.size > this.height + 40) {
+          this.particles.splice(i, 1);
+        }
+      }
+
+      if (this.particles.length > 350) this.particles.splice(0, this.particles.length - 350);
+
+      requestAnimationFrame(t => this.loop(t));
+    }
+  }
+
+  // Initialize heart canvas
+  const canvas = document.getElementById("heart-canvas");
+  if (canvas && canvas.getContext) {
+    new HeartRain(canvas);
+  }
+
+  // Notifications
+  const notificationsRoot = document.getElementById("notifications");
+
+  function createNotification(message, sender = CONFIG.notificationSender, ttl = 4200) {
+    const el = document.createElement("div");
+    el.className = "notify";
+    el.style.opacity = "0";
+    el.style.transform = "translateY(8px)";
+    el.innerHTML = `
+      <div class="bubble">
+        <div class="meta">${sender}</div>
+        <div class="text">${message}</div>
+      </div>
+    `;
+    notificationsRoot.appendChild(el);
+
+    gsap.fromTo(el, { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, ease: "power2.out" });
+
+    // gentle floating loop
+    const floatTween = gsap.to(el, { y: -6, duration: 4 + Math.random() * 2, yoyo: true, repeat: -1, ease: "sine.inOut" });
+
+    setTimeout(() => {
+      floatTween.kill();
+      gsap.to(el, { opacity: 0, y: -16, duration: 0.8, ease: "power2.in", onComplete: () => {
+        if (el && el.parentNode) el.parentNode.removeChild(el);
+      }});
+    }, ttl);
+  }
+
+  function scheduleNextNotification() {
+    if (reducedMotion) return;
+    const [min, max] = CONFIG.notificationInterval;
+    const ms = randInt(min, max);
+    setTimeout(() => {
+      const msg = CONFIG.messages[randInt(0, CONFIG.messages.length - 1)];
+      createNotification(msg, CONFIG.notificationSender);
+      scheduleNextNotification();
+    }, ms);
+  }
+
+  // start notifications after small delay
+  setTimeout(() => scheduleNextNotification(), 2200);
+
+  // HERO transition + scroll
+  const exploreBtn = document.getElementById("explore-btn");
+  const downArrow = document.getElementById("down-arrow");
+  const heroEl = document.querySelector(CONFIG.heroSelector);
+  const heroContent = document.querySelector(CONFIG.heroContentSelector);
+  const heroDivider = document.querySelector(CONFIG.heroDividerSelector);
+  const storiesEl = document.getElementById("stories");
+
+  function openHeroAndScroll() {
+    if (reducedMotion) {
+      storiesEl.scrollIntoView({ behavior: "smooth" });
+      return;
+    }
+    const tl = gsap.timeline({
+      onComplete() {
+        storiesEl.scrollIntoView({ behavior: "smooth" });
+      }
+    });
+
+    tl.to(".blobs .blob", { scale: 1.06, opacity: 0.75, duration: 0.9, ease: "power1.out" }, 0);
+    tl.to(heroContent, { y: -28, scale: 0.98, opacity: 0.9, duration: 0.8, ease: "power2.out" }, 0);
+    tl.to(heroDivider, { height: 140, width: "110%", duration: 0.95, ease: "elastic.out(1, 0.8)" }, 0.05);
+    tl.to(heroEl, { boxShadow: "inset 0 -80px 140px rgba(255,200,220,0.08)", duration: 0.85 }, 0.02);
+  }
+
+  exploreBtn?.addEventListener("click", openHeroAndScroll);
+  downArrow?.addEventListener("click", openHeroAndScroll);
+
+  if (!reducedMotion) {
+    gsap.to("#down-arrow", { y: 6, repeat: -1, yoyo: true, duration: 1.2, ease: "sine.inOut" });
+    gsap.to("#explore-btn", { boxShadow:"0 18px 60px rgba(255,107,138,0.12)", duration:1.2, repeat:-1, yoyo:true, ease:"power1.inOut" });
+  }
+
+  // ScrollTrigger reveal for cards
+  document.querySelectorAll(".reveal").forEach(el => {
+    gsap.fromTo(el, { y: 28, opacity: 0, scale: 0.995 }, {
+      y: 0, opacity: 1, scale: 1, duration: 0.85, ease: "power2.out",
+      scrollTrigger: {
+        trigger: el,
+        start: "top 85%",
+        end: "top 45%",
+        toggleActions: "play none none reverse"
+      }
+    });
+  });
+
+  // Section title fades
+  document.querySelectorAll(".section-title").forEach(title => {
+    gsap.fromTo(title, { y: 12, opacity: 0 }, {
+      y: 0, opacity: 1, duration: 0.9, ease: "power2.out",
+      scrollTrigger: { trigger: title, start: "top 90%" }
+    });
+  });
+
+  // Pause ScrollTriggers when page hidden (performance)
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      ScrollTrigger.getAll().forEach(st => st.disable());
+    } else {
+      ScrollTrigger.getAll().forEach(st => st.enable());
+    }
+  });
+
+  // Accessibility tip in console
+  console.info("Anniversary page loaded — customize messages in CONFIG.messages inside the script tag.");
+  </script>
+</body>
+</html>
